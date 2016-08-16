@@ -12,7 +12,7 @@ module.exports = function(options) {
         accessKeyId: options.key,
         secretAccessKey: options.secret
     });
-
+    
     var updateDefaultRootObject = function (defaultRootObject) {
 
         var deferred = Q.defer();
@@ -32,13 +32,27 @@ module.exports = function(options) {
                 }
 
                 // Causing problems on a default cloudfront setup, why is this needed?
-                if (data.DistributionConfig.Origins.Items instanceof Array && data.DistributionConfig.Origins.Items[0].S3OriginConfig.OriginAccessIdentity === null) {
-                    data.DistributionConfig.Origins.Items[0].S3OriginConfig.OriginAccessIdentity = '';
-                }
-
+                // if (data.DistributionConfig.Origins.Items[0].S3OriginConfig.OriginAccessIdentity === null) {
+                //   data.DistributionConfig.Origins.Items[0].S3OriginConfig.OriginAccessIdentity = '';
+                // }
+                
                 if (data.DistributionConfig.DefaultRootObject === defaultRootObject.substr(1)) {
                     gutil.log('gulp-cloudfront:', "DefaultRootObject hasn't changed, not updating.");
                     return deferred.resolve();
+                }
+                
+                if (options.useErrorPage) {
+                    data.DistributionConfig.CustomErrorResponses = {
+                        Quantity: 1,
+                        Items: [
+                            {
+                                ErrorCode: 403,
+                                ErrorCachingMinTTL: 300,
+                                ResponseCode: '200',
+                                ResponsePagePath: defaultRootObject
+                            },
+                        ]
+                    };
                 }
 
                 // Update the distribution with the new default root object (trim the precedeing slash)
