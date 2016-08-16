@@ -42,7 +42,8 @@ var aws = {
     "secret": "acYxWRu5RRa6CwzQuhdXEfTpbQA+1XQJ7Z1bGTCx",
     "bucket": "bucket-name",
     "region": "us-standard",
-    "distributionId": "E1SYAKGEMSK3OD"
+    "distributionId": "E1SYAKGEMSK3OD",
+    "useErrorPage": true // This will clobber the error pages
 };
 
 var publisher = awspublish.create(aws);
